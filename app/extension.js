@@ -3868,7 +3868,8 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                     player.line(trigger.source, 'gold');
                     player.gainPlayerCard('选择获得其至多' + numb + '张牌', trigger.source, 'he', [1, numb]);
                     player.line(trigger.source, 'fire');
-                    trigger.source.damage('nocard');
+                    const damage = [1, 2].randomGet();
+                    trigger.source.damage(damage,'nocard');
                   }
                 },
                 check: function(event, player) {
@@ -3888,7 +3889,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 trigger: { global: 'phaseJieshuBegin' },
                 filter: function(event, player) {
                   var numa = Math.random();
-                  return numa < 0.90 && event.player.isAlive() && event.player.isDamaged() && !player.hasSkill('jl_nianshou_count2');
+                  return numa < 0.90 && event.player.isAlive() && !player.hasSkill('jl_nianshou_count2');
                 },
                 content: function() {
                   'step 0'
@@ -5330,7 +5331,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                       jl_config.settexiao();
                     }
                     ;
-                    var t = result.targets[0];
+                    t = result.targets[0];
                     let fujian1 = t.getCards();
                     event.tmp = [];
                     if (!event.choosefujian) {
@@ -5341,7 +5342,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                       for (let item of fujian1) {
                         color = get.color(item);
                         set[color]++;
-                        var tmp = fujiancard[color]
+                        tmp = fujiancard[color]
                         fujiancard[color] = event.tmp.push(item);
                       }
                       for (let i in set) {
