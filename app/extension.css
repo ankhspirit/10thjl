@@ -565,7 +565,7 @@
     width: 30%;
     padding-bottom: 40%;
     height: 0;
-    position: sticky;
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
