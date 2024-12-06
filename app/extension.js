@@ -1,9 +1,4 @@
 'use strict';
-game.playThisAudio = function(filePathInAudioDir, audioType, playAudioCallback) {
-  if (lib.config.background_speak) {
-    game.playAudio('..', 'extension', '将灵重置版', 'audio', filePathInAudioDir);
-  }
-};
 game.import("extension", function(lib, game, ui, get, ai, _status) {
 
   let layoutPath = lib.assetURL + 'extension/将灵重置版/';
@@ -2191,6 +2186,11 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
     },
     editable: false,
     precontent: function(config) {
+      game.playThisAudio = function(filePathInAudioDir, audioType, playAudioCallback) {
+        if (lib.config.background_speak) {
+          game.playAudio('..', 'extension', '将灵重置版', 'audio', filePathInAudioDir);
+        }
+      };
       lib.skill._jl_hiddenskill = {
         trigger: {
           global: "gameStart",
