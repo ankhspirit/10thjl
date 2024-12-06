@@ -2389,6 +2389,28 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
         clear: true,
         nopointer: true,
       },
+      "jl_tuig_old": {
+        name:'<div class="hth_menu">▶留言</div>',
+        clear:true,
+        onclick:function(){
+          if(this.hth_more==undefined){
+            var more=ui.create.div('.hth_more',
+              '<div style="border: 1px solid white;text-align:left"><font size=2px>'+
+              'bug反馈请加群591446936。'+
+              '<br>本次更新受助太多，主程序部分和屯田一张桃2305334712这位大佬合力完成。还要感谢萝卜大佬，薯片，风雪迷漫，xiaoas , 呲牙哥 ,周子鱼，念安，星辰化梦，无中-无中，无中无中无中感谢大佬们。还有归心，黄老板，乌鸦，木木枭等大佬的帮助和意见，还有很多大佬的帮忙，在此深表感谢'+
+              '<br>深表感谢，祝各位新年快乐，未来前程似锦。'
+            );
+            this.parentNode.insertBefore(more,this.nextSibling);
+            this.hth_more=more;
+            this.innerHTML='<div class="hth_menu">▼留言</div>';
+          }
+          else{
+            this.parentNode.removeChild(this.hth_more);
+            delete this.hth_more;
+            this.innerHTML='<div class="hth_menu">▶留言</div>';
+          };
+        },
+      },
       "jl_tuigsm": {
         name: '<div class="hth_menu">▶推广说明</div>',
         clear: true,
