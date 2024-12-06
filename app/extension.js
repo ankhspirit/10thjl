@@ -6,13 +6,21 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
   let loadCSS = false;
   let extensionName = 'extension_将灵重置版_';
   jl_config.extensionName = extensionName;
-  const s_character = ['shenzhouyu', 'shenzhaoyun', 'shencaocao', 'zhugeguo', 'nianshou', 'caoying', 'lingju', 'xiaosha', 'huaman', 'wuliuqi', 'shenguanyu', 'guansuo', 'zhangqiying'];
+  const s_character = ['shenzhouyu', 'shenzhaoyun', 'shencaocao', 'zhugeguo', 'nianshou', 'caoying', 'lingju', 'xiaosha', 'huaman', 'wuliuqi', 'shenguanyu', 'guansuo', 'zhangqiying', 'caochun'];
   const a_character = ['diaochan', 'luxun', 'guojia', 'xiaoqiao', 'jiangwei', 'lvbu', 'zhugeliang', 'zhurong', 'zhoufei', 'xizhicai', 'sunshangxiang', 'menghuo', 'zhangxingcai', 'zhangfei'];
   const b_character = ['guanyinping', 'sundeng', 'caorui', 'guohuanghou', 'yuanshao', 'huaxiong', 'xunyou'];
   // this.c_character={'zhangyi':'张嶷','sunluban':'孙鲁班','guohuai':'郭淮'};
   // this.jl_config.jlname={
 
   jl_config.jlname = {
+    "caochun": {
+      "name": "曹纯",
+      "des": "",
+      "skill": {
+        "【缮甲】": "▶每名角色的出牌阶段开始时，你有85%的概率可以摸2~4张牌，然后若此时是你的回合内，你可以视为使用一张【杀】，此【杀】不能被响应且伤害+1~2。（每轮限3次）",
+        "【骁锐】": "▶当你对其他角色造成伤害时，你有90%的概率随机获得其1~4张牌且此伤害+1~4（每回合限触发4次）"
+      }
+    },
     "zhangqiying": {
       "name": "张琪瑛",
       "des": "",
@@ -291,7 +299,8 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
   }
   // this.jl_valueres={
   let jl_valueres = {
-    "zhangqiying": { "gain": true, "sp": 0, "quality": "s" },
+    "caochun": { "gain": true, "sp": 0, "quality": "s" },
+    "zhangqiying": { "gain": false, "sp": 0, "quality": "s" },
     "shenzhouyu": { "gain": false, "sp": 0, "quality": "s" },
     "shenzhaoyun": { "gain": false, "sp": 0, "quality": "s" },
     "shencaocao": { "gain": false, "sp": 0, "quality": "s" },
@@ -338,8 +347,8 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
     game.saveConfig('jl_value', jl_valueres);
     game.saveConfig('jl_gmczjl', 0);
     game.saveConfig('jl_cheat', 0);
-  } else if (!Object.keys(lib.config.jl_value).contains("zhangqiying")) {
-    lib.config.jl_value["zhangqiying"] = { "gain": true, "sp": 0, "quality": "s" };
+  } else if (!Object.keys(lib.config.jl_value).contains("caochun")) {
+    lib.config.jl_value["caochun"] = { "gain": true, "sp": 0, "quality": "s" };
   }
 
   if (lib.config.jl_bugnum != 0) {
@@ -2415,6 +2424,137 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               name: "圣兽之力",
             },
           },
+          jl_caochun: {
+            charlotte: true,
+            locked: true,
+            group: [
+              "jl_caochun_shanjia",
+              "jl_caochun_xiaorui",
+            ],
+            subSkill: {
+              shanjia: {
+                name: '缮甲',
+                audio: false,
+                forced: false,
+                locked: true,
+                prompt2: '每名角色的出牌阶段开始时，你有85%的概率可以摸2~4张牌，然后若此时是你的回合内，你可以视为使用一张【杀】，此【杀】不能被响应且伤害+1~2。（每轮限3次）',
+                trigger: {
+                  global: "phaseUseBegin",
+                },
+                filter: function(event, player) {
+                  var numa = Math.random();
+                  return numa < 0.85 && !player.hasSkill('jl_caochun_count3');
+                },
+                content: function(game, event, current) {
+                  'step 0'
+                  if (player.hasSkill('jl_caochun_count2')) player.addTempSkill('jl_caochun_count3', 'roundStart')
+                  else if (player.hasSkill('jl_caochun_count1')) player.addTempSkill('jl_caochun_count2', 'roundStart')
+                  else player.addTempSkill('jl_caochun_count1', 'roundStart');
+                  'step 1'
+                  game.playThisAudio('voice/' + event.name + '1');
+                  var numa = [2, 3, 4].randomGet();
+                  player.draw(numa);
+                  'step 2'
+                  if (event._trigger.player === player) {
+                    player.chooseTarget(get.prompt("jl_caochun_shanjia"),"视为使用一张【杀】，此【杀】不能被响应且伤害+1~2",function(card,player,target){
+                      if(player==target) return false;
+                      return player.canUse({name:'sha'},target,false);
+                    })
+                  }
+                  'step 3'
+                  if(result.bool){
+                    player.storage.shanjiaSha = true;
+                    player.addTempSkill('jl_caochun_count4', {player:'shaEnd'})
+                    player.logSkill('jl_caochun_shanjia',result.targets);
+                    player.useCard({name:'sha',isCard:true},result.targets[0],false);
+                    result.targets[0].addTempSkill('jl_caochun_count5', {player:'shaEnd'})
+                  }
+                  'step 4'
+                  player.storage.shanjiaSha = false;
+                },
+              },
+              xiaorui: {
+                name: '骁锐',
+                audio: false,
+                forced: false,
+                locked: true,
+                prompt2: '当你对其他角色造成伤害时，你有90%的概率随机获得其1~4张牌且此伤害+1~4（每回合限触发4次）',
+                trigger: {
+                  source: "damageBefore",
+                },
+                filter: function(event, player) {
+                  var numa = Math.random();
+                  return numa < 0.9 && !player.hasSkill('jl_caochun_count9');
+                },
+                content: function(game, event, current) {
+                  'step 0'
+                  if (player.hasSkill('jl_caochun_count8')) player.addTempSkill('jl_caochun_count9', 'phaseEnd')
+                  else if (player.hasSkill('jl_caochun_count7')) player.addTempSkill('jl_caochun_count8', 'phaseEnd')
+                  else if (player.hasSkill('jl_caochun_count6')) player.addTempSkill('jl_caochun_count7', 'phaseEnd')
+                  else player.addTempSkill('jl_caochun_count6', 'phaseEnd');
+                  'step 1'
+                  if (trigger.player) {
+                    game.playThisAudio('voice/' + event.name + '1');
+                    const numb = [1, 2, 3, 4].randomGet();
+                    player.line(trigger.player, 'gold');
+                    let cardList = [];
+                    while (cardList.length < numb && cardList.length < trigger.player.countCards('he')) {
+                      const card = trigger.player.getCards('he').randomGet()
+                      if (card && !cardList.includes(card)) {
+                        cardList.push(card)
+                      }
+                    }
+                    if(cardList.length>0){
+                      player.gain(cardList,trigger.player,'giveAuto','bySelf');
+                    }
+                    player.line(trigger.player, 'fire');
+                    const damage = [1, 2, 3, 4].randomGet();
+                    trigger.num += damage;
+                  }
+                },
+              },
+              count1: {},
+              count2: {},
+              count3: {},
+              count4: {
+                audio: false,
+                forced: true,
+                locked: true,
+                trigger: {
+                  player: "useCard",
+                },
+                filter: function(event, player) {
+                  return player.storage.shanjiaSha && get.name(event.card) === "sha";
+                },
+                content: function(game, event, current) {
+                  trigger.directHit.addArray(game.filterPlayer(function(current){
+                    return current !== player;
+                  }));
+                },
+              },
+              count5: {
+                audio: false,
+                charlotte: true,
+                frequent: true,
+                forced: true,
+                trigger: {
+                  player: "damageBefore",
+                },
+                filter: function(event, player) {
+                  return event.source.storage.shanjiaSha;
+                },
+                content: function() {
+                  var numb = [1, 2].randomGet();
+                  trigger.num += numb;
+                },
+              },
+              count6: {},
+              count7: {},
+              count8: {},
+              count9: {},
+            },
+
+          },
           jl_zhangqiying: {
             charlotte: true,
             locked: true,
@@ -2440,7 +2580,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 content: function(game, event, current) {
                   'step 0'
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   event.list = [];
                   event.num = 0;
                   'step 1'
@@ -2449,7 +2589,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                     for (let j = 0; j < event.list.length; j++) {
                       if (card.suit == event.list[j].suit) return false;
                     }
-                    ;
                     return true;
                   });
                   if (card) event.list.push(card);
@@ -2463,7 +2602,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                     player.storage.jl_zhoufei_kongshengBegin[i] = event.list[i];
                     numOfCards.add(get.number(event.list[i]));
                   }
-                  ;
                   player.gain(event.list, 'gain2');
                   if (numOfCards.size < 4) {
                     player.recover();
@@ -2498,14 +2636,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 content: function() {
                   'step 0'
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player.isUnderControl()) {
                     game.modeSwapPlayer(player);
                   }
-                  // game.playThisAudio('jlVoice/'+event.name+'1');
-                  // if(player==game.me){
-                  // 	jl_config.settexiao();
-                  // };
                   var num = 4;
                   var cards = get.cards(num);
                   event.cards = cards;
@@ -2670,7 +2804,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                     game.updateRoundNumber();
                     game.delay(2);
                   }
-                  ;
                 },
               },
               zhenyi1: {
@@ -2687,7 +2820,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   return numa < 0.842 && trigger.player != player && !player.hasSkill('jl_zhangqiying_count2');
                 },
                 content: function() {
-                  game.playThisAudio('jlVoice/jl_zhangqiying_zhenyi1');
+                  game.playThisAudio('voice/jl_zhangqiying_zhenyi1');
                   if (player.hasSkill('jl_zhangqiying_count1')) player.addTempSkill('jl_zhangqiying_count2', 'phaseZhunbeiBegin')
                   else player.addTempSkill('jl_zhangqiying_count1', 'phaseZhunbeiBegin');
                   trigger.num = trigger.num + 1;
@@ -2710,7 +2843,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   return numa < 0.842 && trigger.source != player && !player.hasSkill('jl_zhangqiying_count4');
                 },
                 content: function(event) {
-                  game.playThisAudio('jlVoice/jl_zhangqiying_zhenyi1');
+                  game.playThisAudio('voice/jl_zhangqiying_zhenyi1');
                   if (player.hasSkill('jl_zhangqiying_count3')) player.addTempSkill('jl_zhangqiying_count4', 'phaseZhunbeiBegin')
                   else player.addTempSkill('jl_zhangqiying_count3', 'phaseZhunbeiBegin');
                   trigger.num = 0;
@@ -2747,11 +2880,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   var x = game.countPlayer(function(current) {
                     return current.hasSex('female');
                   });
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   player.draw(x + 1)
                   player.storage.jl_guansuo_buff1 = x + 1;
                   player.addTempSkill('jl_guansuo_buff1');
@@ -2816,11 +2948,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                     if (event.list.contains('xindangxian')) return 'xindangxian';
                     return 0;
                   });
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   'step 2'
                   if (result.control == 'cancel2') {
                     player.draw([1, 2, 3].randomGet());
@@ -2830,7 +2961,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                     if (result.control == 'xindangxian') {
                       player.storage.xinfuli = true
                     }
-                    ;
                     player.draw([1, 2, 3].randomGet());
                     player.addTempSkill(result.control, { player: 'phaseEnd' })
                     player.popup(result.control);
@@ -2922,11 +3052,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   "step 0"
                   if (trigger.delay == false) game.delay();
                   "step 1"
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   player.draw([2, 1].randomGet());
                 },
                 ai: {
@@ -2950,11 +3079,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 content: function() {
                   "step 0"
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   player.addTempSkill('jl_zhangxingcai_buff');
                   player.storage.jl_zhangxingcai_buff = [2, 3].randomGet();
                 },
@@ -3009,11 +3137,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 content: function() {
                   "step 0"
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   player.recover();
                   player.draw(3);
                 },
@@ -3038,11 +3165,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 content: function() {
                   "step 0"
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   player.addTempSkill('jl_zhangfei_buff');
                   player.storage.jl_zhangfei_buff = [1, 2, 3, 4, 5].randomGet();
                 },
@@ -3104,17 +3230,15 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   });
                   'step 1'
                   if (result.targets) {
-                    game.playThisAudio('jlVoice/' + event.name + '1');
+                    game.playThisAudio('voice/' + event.name + '1');
                     if (player == game.me) {
                       jl_config.settexiao();
                     }
-                    ;
                     result.targets.sortBySeat();
                     for (var i = 0; i < result.targets.length; i++) {
                       player.useCard({ name: 'sha', isCard: true }, result.targets[i], false)
                     }
                   }
-                  ;
                   event.finish();
                 },
                 ai: {
@@ -3168,11 +3292,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 content: function(event, card, player) {
                   'step 0'
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   _status.currentPhase.loseHp(player.countMark('jl_shenguanyu_jlwuhun'));
                   player.removeMark('jl_shenguanyu_jlwuhun', player.countMark('jl_shenguanyu_jlwuhun'));
                 },
@@ -3273,11 +3396,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 content: function(event) {
                   let n = [2, 3].randomGet();
-                  game.playThisAudio('jlVoice/' + event.name + '1')
+                  game.playThisAudio('voice/' + event.name + '1')
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   let cards = trigger.player.getCards('he').randomGets(n);
                   trigger.player.discard(cards);
                 },
@@ -3366,11 +3488,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   'step 1'
                   if (result.targets) {
                     player.logSkill('jl_huaman_mansi1');
-                    game.playThisAudio('jlVoice/' + event.name + '1')
+                    game.playThisAudio('voice/' + event.name + '1')
                     if (player == game.me) {
                       jl_config.settexiao();
                     }
-                    ;
                     trigger.targets.addArray(result.targets);
                   } else {
                     player.storage.counttrigger.jl_huaman_mansi2--;
@@ -3407,11 +3528,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 content: function(event) {
                   let n = [1, 2].randomGet();
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   trigger.source.draw(n);
                   player.draw(n);
                   trigger.num++;
@@ -3453,11 +3573,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { player: 'damageBegin4' },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   var numb = [1, 2].randomGet();
                   trigger.num = trigger.num - numb;
                 },
@@ -3474,11 +3593,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { source: 'damageBegin1' },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   var numb = [1, 2].randomGet();
                   trigger.num = trigger.num + numb;
                 },
@@ -3498,11 +3616,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { global: 'dying' },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   var numb = [3, 5].randomGet();
                   var numc = [1, 2].randomGet();
                   player.draw(numb);
@@ -3535,11 +3652,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { player: ['useCard'] },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   var i = 0;
                   var list = [];
                   var numb = [2, 3, 4].randomGet();
@@ -3556,9 +3672,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                       });
                       if (card) list.push(card);
                     }
-                    ;
                   }
-                  ;
                   event.list = list;
                   player.gain(event.list, 'gain2');
                   if (_status.currentPhase != player) player.getStat().skill.jl_zhugeguo_qirang++;
@@ -3591,11 +3705,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { player: 'phaseJieshuBegin' },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   'step 0'
                   var numb = player.getHistory('custom', function(evt) {
                     return evt.count == true;
@@ -3618,11 +3731,9 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                       event.cards.remove(list[i]);
                     }
                   }
-                  ;
                   for (var i = 0; i < event.cards.length; i++) {
                     ui.cardPile.insertBefore(event.cards[i], ui.cardPile.firstChild);
                   }
-                  ;
                   'step 3'
                   var suita = get.suit(event.list[0]);
                   var suitb = get.suit(event.list[1]);
@@ -3640,9 +3751,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                       player.line(target, 'fire');
                       target.damage(numd, 'nocard');
                     }
-                    ;
                   }
-                  ;
                 },
               },
             },
@@ -3675,18 +3784,16 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   'step 1'
                   if (result.targets) {
                     result.targets.sortBySeat();
-                    game.playThisAudio('jlVoice/' + event.name + '1');
+                    game.playThisAudio('voice/' + event.name + '1');
                     if (player == game.me) {
                       jl_config.settexiao();
                     }
-                    ;
                     player.logSkill('jl_shenzhouyu_yeyan', result.targets);
                     player.line(result.targets, 'fire');
                     for (var i = 0; i < result.targets.length; i++) {
                       result.targets[i].damage(2, 'fire', 'nocard');
                     }
                   }
-                  ;
                 },
               },
               qinyin: {
@@ -3715,11 +3822,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   'step 2'
                   if (result.bool) {
                     result.targets.sortBySeat();
-                    game.playThisAudio('jlVoice/' + event.name + [1, 2, 3].randomGet());
+                    game.playThisAudio('voice/' + event.name + [1, 2, 3].randomGet());
                     if (player == game.me) {
                       jl_config.settexiao();
                     }
-                    ;
                     player.logSkill('jl_shenzhouyu_qinyin', result.targets);
                     var targets = result.targets;
                     event.targets = targets;
@@ -3738,18 +3844,15 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                     targets[event.num].recover();
                     event.num++
                   }
-                  ;
                   if (result.control == '失去体力') {
                     player.line(targets[event.num], 'fire');
                     targets[event.num].loseHp();
                     event.num++
                   }
-                  ;
                   if (result.control == 'cancel2') {
                     event.num++;
                     event.goto(3);
                   }
-                  ;
                   'step 5'
                   event.goto(3);
                 },
@@ -3774,11 +3877,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { player: ['phaseZhunbeiBegin', 'dying', 'dyingAfter', 'phaseJieshuBegin'] },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   var numb = [2, 3, 4].randomGet();
                   player.draw(numb);
                   player.recover();
@@ -3797,11 +3899,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { player: 'useCard' },
                 content: function() {
-                  game.playThisAudio('jlVoice/jl_shenzhaoyun_longhun1');
+                  game.playThisAudio('voice/jl_shenzhaoyun_longhun1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   player.line(_status.currentPhase, 'gold');
                   player.logSkill('jl_shenzhaoyun_longhun1', _status.currentPhase);//ppppppppppppppppppppppppppppppppppp
                   player.gainPlayerCard(_status.currentPhase, 'he', [1, 2]);
@@ -3823,11 +3924,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { player: 'useCard' },
                 content: function() {
-                  game.playThisAudio('jlVoice/jl_shenzhaoyun_longhun1');
+                  game.playThisAudio('voice/jl_shenzhaoyun_longhun1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   var numb = [1, 2, 3].randomGet();
                   trigger.baseDamage += numb;
                 },
@@ -3859,11 +3959,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 content: function() {
                   player.draw(2);
                   if (trigger.source) {
-                    game.playThisAudio('jlVoice/' + event.name + '1');
+                    game.playThisAudio('voice/' + event.name + '1');
                     if (player == game.me) {
                       jl_config.settexiao();
                     }
-                    ;
                     var numb = [1, 2].randomGet();
                     player.line(trigger.source, 'gold');
                     player.gainPlayerCard('选择获得其至多' + numb + '张牌', trigger.source, 'he', [1, numb]);
@@ -3899,11 +3998,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   });
                   'step 1'
                   if (result.control == '选项一') {
-                    game.playThisAudio('jlVoice/' + event.name + '1');
+                    game.playThisAudio('voice/' + event.name + '1');
                     if (player == game.me) {
                       jl_config.settexiao();
                     }
-                    ;
                     if (player.hasSkill('jl_nianshou_count1')) player.addTempSkill('jl_nianshou_count2', 'roundStart')
                     else player.addTempSkill('jl_nianshou_count1', 'roundStart');
                     player.line(trigger.player, 'green');
@@ -3911,13 +4009,11 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                     player.line(trigger.player, 'green');
                     trigger.player.draw(2);
                   }
-                  ;
                   if (result.control == '选项二') {
-                    game.playThisAudio('jlVoice/' + event.name + '1');
+                    game.playThisAudio('voice/' + event.name + '1');
                     if (player == game.me) {
                       jl_config.settexiao();
                     }
-                    ;
                     if (player.hasSkill('jl_nianshou_count1')) player.addTempSkill('jl_nianshou_count2', 'roundStart')
                     else player.addTempSkill('jl_nianshou_count1', 'roundStart');
                     player.line(trigger.player, 'fire');
@@ -3926,7 +4022,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                     player.line(trigger.player, 'fire');
                     trigger.player.discard(cards);
                   }
-                  ;
                   if (result.control == 'cancel2') event.finish();
                 },
                 check: function(event, player) {
@@ -3954,11 +4049,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { player: 'phaseUseBegin' },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   var numb = player.countCards('h', function(card) {
                     return card.name == 'sha';
                   });
@@ -4009,11 +4103,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 trigger: { source: 'damageSource' },
                 group: ['jl_xiaosha_shu'],
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   var i = 0;
                   var list = [];
                   var numb = [1, 2, 3].randomGet();
@@ -4030,9 +4123,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                       });
                       if (card) list.push(card);
                     }
-                    ;
                   }
-                  ;
                   event.list = list;
                   player.gain(event.list, 'gain2');
                   if (!player.storage.shuli) player.storage.shuli = [];
@@ -4165,11 +4256,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { player: 'useCard' },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   var numb = [1, 2].randomGet();
                   trigger.baseDamage += numb;
                 },
@@ -4188,11 +4278,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { player: 'phaseUseBegin' },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   player.addTempSkill('jl_guanyu_buff');
                 },
               },
@@ -4216,11 +4305,9 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   if (!trigger.target.hasSkill('fengyin')) {
                     trigger.target.addTempSkill('fengyin');
                   }
-                  ;
                   if (!trigger.target.hasSkill('ol_wuqian_targeted')) {
                     trigger.target.addTempSkill('ol_wuqian_targeted');
                   }
-                  ;
                   player.getStat().card.sha--
                   'step 1'
                   player.removeSkill('jl_guanyu_buff');
@@ -4245,11 +4332,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { player: 'phaseJieshuBegin' },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   var numb = [2, 3].randomGet();
                   player.draw(numb);
                 },
@@ -4281,11 +4367,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   });
                   'step 1'
                   if (result.bool) {
-                    game.playThisAudio('jlVoice/' + event.name + '1');
+                    game.playThisAudio('voice/' + event.name + '1');
                     if (player == game.me) {
                       jl_config.settexiao();
                     }
-                    ;
                     player.line(result.targets[0], 'red');
                     player.logSkill('jl_diaochan_lijian', result.targets[0]);
                     result.targets[0].loseHp(2);
@@ -4312,11 +4397,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 trigger: { player: 'damageEnd' },
                 content: function() {
                   'step 0'
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   event.count = 1;
                   'step 1'
                   player.draw(3);
@@ -4366,11 +4450,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { player: 'judgeEnd' },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   player.gain(trigger.result.card, 'gain2');
                   player.draw(2);
                 }
@@ -4399,11 +4482,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 trigger: { player: 'loseAfter' },
                 content: function() {
                   'step 0'
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   event.num = 0;
                   var numb = trigger.hs.length;
                   player.chooseTarget('选择发动连营的目标', [1, numb]).set('ai', function(target) {
@@ -4430,7 +4512,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                     });
                     if (card) list.push(card);
                   }
-                  ;
                   event.targets[event.num].gain(list, 'gain2');
                   event.num++;
                   'step 4'
@@ -4448,11 +4529,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { target: 'useCardToTargeted' },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   player.draw(2);
                 },
               },
@@ -4485,11 +4565,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   });
                   'step 1'
                   if (result.bool) {
-                    game.playThisAudio('jlVoice/' + event.name + '1');
+                    game.playThisAudio('voice/' + event.name + '1');
                     if (player == game.me) {
                       jl_config.settexiao();
                     }
-                    ;
                     result.targets.sortBySeat();
                     event.targets = result.targets;
                     player.line(result.targets, 'gold');
@@ -4516,11 +4595,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   if (player.isUnderControl()) {
                     game.modeSwapPlayer(player);
                   }
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   var num = 5;
                   var cards = get.cards(num);
                   event.cards = cards;
@@ -4691,7 +4769,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                     game.updateRoundNumber();
                     game.delay(2);
                   }
-                  ;
                 },
               },
             },
@@ -4714,11 +4791,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { player: 'useCardToPlayered' },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   player.gainPlayerCard(trigger.target, true, 'he');
                   player.draw();
                 },
@@ -4741,11 +4817,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { global: 'useCardAfter' },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   if (player.hasSkill('jl_zhurong_count1')) player.addTempSkill('jl_zhurong_count2', 'roundStart')
                   else player.addTempSkill('jl_zhurong_count1', 'roundStart');
                   player.gain(trigger.cards, 'gain2');
@@ -4775,11 +4850,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 trigger: { player: 'useCardToPlayered' },
                 logTarget: 'target',
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   trigger.getParent().directHit.push(trigger.target);
                   trigger.target.addTempSkill('qinggang2');
                   trigger.target.storage.qinggang2.add(trigger.card);
@@ -4825,11 +4899,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                     event.player.countGainableCards(player, 'hej') > 0);
                 },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   player.gainPlayerCard(get.prompt('jl_lvbu_liyu', trigger.player), trigger.player, 'hej', 'visibleMove').player.line(trigger.targets, 'red');
                   trigger.player.damage('nocard');
                 },
@@ -4854,11 +4927,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 trigger: { player: 'damageEnd' },
                 content: function() {
                   'step 0'
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   player.chooseTarget('选择一名角色令其摸两张牌').set('ai', function(target) {
                     return get.attitude(_status.event.player, target);
                   });
@@ -4867,7 +4939,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                     player.line(result.targets, 'green');
                     result.targets[0].draw(2);
                   }
-                  ;
                   'step 2'
                   player.chooseTarget('选择一名角色弃置其至多两张牌').set('ai', function(target) {
                     return -get.attitude(_status.event.player, target);
@@ -4877,7 +4948,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                     player.line(result.targets, 'fire');
                     player.discardPlayerCard(result.targets[0], 'he', [1, 2]);
                   }
-                  ;
                 },
               },
               add: {
@@ -4909,7 +4979,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                     if (!target.storage.jl_xizhicai_mark) target.storage.jl_xizhicai_mark = [];
                     target.storage.jl_xizhicai_mark.add(player);
                   }
-                  ;
                 },
               },
               clear: {
@@ -4952,11 +5021,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { global: 'damageEnd' },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   player.recover();
                   player.draw(2);
                 },
@@ -5001,11 +5069,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   });
                   'step 1'
                   if (result.bool) {
-                    game.playThisAudio('jlVoice/' + event.name + '1');
+                    game.playThisAudio('voice/' + event.name + '1');
                     if (player == game.me) {
                       jl_config.settexiao();
                     }
-                    ;
                     player.discard(result.cards);
                     var target = result.targets[0];
                     player.line(target, 'fire');
@@ -5016,7 +5083,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   } else {
                     event.finish();
                   }
-                  ;
                   'step 2'
                   event.related = event.target.loseHp();
                   'step 3'
@@ -5038,11 +5104,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { player: 'loseAfter' },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   player.draw(2);
                 },
               },
@@ -5066,11 +5131,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 trigger: { player: 'phaseDrawBegin1' },
                 content: function() {
                   'step 0'
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   event.card = get.cards(1);
                   game.cardsGotoOrdering(event.card);
                   player.showCards(event.card);
@@ -5093,11 +5157,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 trigger: { target: 'useCardToTargeted' },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   trigger.getParent().excluded.add(player);
                   player.draw(2);
                 },
@@ -5135,16 +5198,14 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   });
                   'step 1'
                   if (result.targets) {
-                    game.playThisAudio('jlVoice/' + event.name + '1');
+                    game.playThisAudio('voice/' + event.name + '1');
                     if (player == game.me) {
                       jl_config.settexiao();
                     }
-                    ;
                     var numb = [1, 2, 3].randomGet();
                     player.line(result.targets);
                     result.targets[0].draw(numb);
                   }
-                  ;
                 },
               },
               kongshengBegin: {
@@ -5159,11 +5220,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 trigger: { player: 'phaseZhunbeiBegin' },
                 content: function() {
                   'step 0'
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   event.list = [];
                   event.num = 0;
                   'step 1'
@@ -5172,7 +5232,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                     for (var j = 0; j < event.list.length; j++) {
                       if (card.name == event.list[j].name) return false;
                     }
-                    ;
                     return true;
                   });
                   if (card) event.list.push(card);
@@ -5184,7 +5243,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   for (var i = 0; i < 4; i++) {
                     player.storage.jl_zhoufei_kongshengBegin[i] = event.list[i];
                   }
-                  ;
                   player.gain(event.list, 'gain2');
                 },
               },
@@ -5199,11 +5257,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 trigger: { player: 'phaseJieshuBegin' },
                 content: function() {
                   'step 0'
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   var cards = player.getCards('h');
                   var list = player.storage.jl_zhoufei_kongshengBegin;
                   event.list = [];
@@ -5211,7 +5268,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   for (var i = 0; i < 4; i++) {
                     if (cards.contains(list[i])) event.list.push(list[i]);
                   }
-                  ;
                   'step 1'
                   player.discard(event.list);
                   'step 2'
@@ -5258,11 +5314,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
 
                   "step 1"
                   if (result.bool) {
-                    game.playThisAudio('jlVoice/' + event.name + '1');
+                    game.playThisAudio('voice/' + event.name + '1');
                     if (player == game.me) {
                       jl_config.settexiao();
                     }
-                    ;
                     event.target = result.targets[0];
                     player.logSkill('jl_caoying_lingren', event.target)
                     event.target.addTempSkill("jl_caoyingewss", {
@@ -5273,7 +5328,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                     player.storage.counttrigger.jl_caoying_lingren--;
                     event.finish();
                   }
-                  ;
                   "step 2"
                   var numb = [1, 2, 3].randomGet();
                   player.draw(numb);
@@ -5326,11 +5380,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   }).set('prompt2', '你的回合开始时或结束时，你可以观看一名其他角色的手牌，然后你可以获得其中至多两张牌，若颜色相同，对其造成一点伤害。')
                   "step 1"
                   if (result.bool) {
-                    game.playThisAudio('jlVoice/' + event.name + '1');
+                    game.playThisAudio('voice/' + event.name + '1');
                     if (player == game.me) {
                       jl_config.settexiao();
                     }
-                    ;
                     t = result.targets[0];
                     let fujian1 = t.getCards();
                     event.tmp = [];
@@ -5364,7 +5417,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   } else {
                     event.finish();
                   }
-                  ;
                   "step 2"
                   if (result.bool) {
                     player.logSkill(event.name, t);
@@ -5419,18 +5471,16 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   } else {
                     var y = 4;
                   }
-                  ;
                   var z = Math.floor(y / 2);
                   player.chooseCardButton('观沧海：可以获得其中' + z + '张', z, c.slice(0, y)).ai = function(button) {
                     return true;
                   };
                   "step 1"
                   if (result.bool) {
-                    game.playThisAudio('jlVoice/' + event.name + [1].randomGet());
+                    game.playThisAudio('voice/' + event.name + [1].randomGet());
                     if (player == game.me) {
                       jl_config.settexiao();
                     }
-                    ;
                     for (var i = 0; i < result.links.length; i++) {
                       player.gain(result.links[i]);
                     }
@@ -5473,18 +5523,16 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   });
                   "step 1"
                   if (result.bool) {
-                    game.playThisAudio('jlVoice/' + event.name + [1].randomGet());
+                    game.playThisAudio('voice/' + event.name + [1].randomGet());
                     if (player == game.me) {
                       jl_config.settexiao();
                     }
-                    ;
                     trigger.target = result.targets[0];
                     player.line(result.targets[0], 'green');
                     game.log(player, '将', trigger.card.name, '此牌目标改为', result.targets[0]);
                   } else {
                     player.getStat().skill.jl_shencaocao_feiying--;
                   }
-                  ;
                 },
               },
             },
@@ -5520,7 +5568,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   return event.card && event.card.name == 'sha';
                 },
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                 },
               },
               zhanshen: {
@@ -5539,7 +5587,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   "step 1"
 
                   if (result.bool) {
-                    game.playThisAudio('jlVoice/' + event.name + [1, 2].randomGet());
+                    game.playThisAudio('voice/' + event.name + [1, 2].randomGet());
                     for (var i = 0; i < result.targets.length; i++)
                       result.targets[i].addTempSkill('jl_shenlvbu_wq_a', { player: 'phaseAfter' });
                     player.logSkill('jl_shenlvbu_zhanshen', result.targets);
@@ -5547,7 +5595,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   } else {
                     player.getStat().skill.jl_shenlvbu_zhanshen = 0;
                   }
-                  ;
 
                 },
                 derivation: ['qinggang2'],
@@ -5633,7 +5680,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   });
                   "step 1"
                   if (result.bool) {
-                    game.playThisAudio('jlVoice/' + event.name + [1, 2].randomGet());
+                    game.playThisAudio('voice/' + event.name + [1, 2].randomGet());
                     for (var i = 0; i < result.targets.length; i++) {
                       result.targets[i].discard(result.targets[i].getCards('he'));
                     }
@@ -5661,11 +5708,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 content: function() {
                   'step 0'
                   player.draw();
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   'step 1'
                   player.chooseUseTarget({ name: 'huogong' }, '是否视为使用一张【火攻】？');
                   'step 2'
@@ -5692,11 +5738,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 },
                 usable: 2,
                 content: function() {
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   trigger.cancel();
                   player.draw('nodelay');
                 },
@@ -5727,11 +5772,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   }).set('prompt', '请选择【结姻】的目标');
                   'step 1'
                   if (result.bool) {
-                    game.playThisAudio('jlVoice/' + event.name + '1');
+                    game.playThisAudio('voice/' + event.name + '1');
                     if (player == game.me) {
                       jl_config.settexiao();
                     }
-                    ;
                     var num = [1, 2].randomGet();
                     player.recover();
                     result.targets[0].recover();
@@ -5758,11 +5802,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   event.count = trigger.getl(player).es.length;
                   "step 1"
                   event.count--;
-                  game.playThisAudio('jlVoice/' + event.name + '1');
+                  game.playThisAudio('voice/' + event.name + '1');
                   if (player == game.me) {
                     jl_config.settexiao();
                   }
-                  ;
                   player.draw(2);
                   "step 2"
                   if (event.count > 0) {
@@ -5803,7 +5846,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               source: 'damageBegin',
             },
             content: function() {
-              game.playThisAudio('jlVoice/jl_guanyinping_xuehen1');
+              game.playThisAudio('voice/jl_guanyinping_xuehen1');
               trigger.num++;
               player.draw();
               if (player == game.me) {
@@ -5829,7 +5872,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             frequent: true,
             content: function() {
               'step 0'
-              game.playThisAudio('jlVoice/jl_sundeng_kuangbi1');
+              game.playThisAudio('voice/jl_sundeng_kuangbi1');
               var num = [1, 2, 3].randomGet();
               'step 1'
 
@@ -5840,7 +5883,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   jl_config.settexiao();
                 }
                 ;
-                game.playThisAudio('jlVoice/jl_sundeng_kuangbi1');
+                game.playThisAudio('voice/jl_sundeng_kuangbi1');
                 num--;
               } else {
                 game.log('弃牌堆没牌!')
@@ -5866,7 +5909,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             },
             direct: true,
             content: function() {
-              game.playThisAudio('jlVoice/jl_caorui_huituo1');
+              game.playThisAudio('voice/jl_caorui_huituo1');
               player.draw();
               player.recover();
               if (player == game.me) {
@@ -5897,7 +5940,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 return get.type(card) == 'trick' || get.type(card) == 'delay';
               });
               if (card) {
-                game.playThisAudio('jlVoice/jl_guohuanggou_jiaozhao1');
+                game.playThisAudio('voice/jl_guohuanggou_jiaozhao1');
                 if (player == game.me) {
                   jl_config.settexiao();
                 }
@@ -5925,7 +5968,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             },
             content: function() {
               player.addTempSkill(event.name + '_x');
-              game.playThisAudio('jlVoice/jl_yuanshao_xueyi1');
+              game.playThisAudio('voice/jl_yuanshao_xueyi1');
               if (player == game.me) {
                 jl_config.settexiao();
               }
@@ -5968,7 +6011,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 jl_config.settexiao();
               }
               ;
-              game.playThisAudio('jlVoice/jl_huaxiong_yaowu1');
+              game.playThisAudio('voice/jl_huaxiong_yaowu1');
             }
           },
           jl_xunyou: {
@@ -5989,7 +6032,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             content: function() {
               "step 0"
               player.draw();
-              game.playThisAudio('jlVoice/jl_xunyou_zhiyu1');
+              game.playThisAudio('voice/jl_xunyou_zhiyu1');
               if (player == game.me) {
                 jl_config.settexiao();
               }
@@ -6013,7 +6056,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             },
             // forced:true,
             content: function() {
-              game.playThisAudio('jlVoice/jl_zhangyi_shizhi1');
+              game.playThisAudio('voice/jl_zhangyi_shizhi1');
               if (player == game.me) {
                 jl_config.settexiao();
               }
@@ -6048,7 +6091,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             },
             direct: true,
             content: function() {
-              game.playThisAudio('jlVoice/jl_sunluban_jiaoyin1');
+              game.playThisAudio('voice/jl_sunluban_jiaoyin1');
               if (player == game.me) {
                 jl_config.settexiao();
               }
@@ -6076,7 +6119,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
 
               }
               ;
-              game.playThisAudio('jlVoice/jl_guohuai_jingce1');
+              game.playThisAudio('voice/jl_guohuai_jingce1');
               player.draw(2);
             },
           },
@@ -6086,6 +6129,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
           "jl_dj_info": "",
 
 
+          "jl_caochun": "曹纯",
           "jl_zhangqiying": "张琪瑛",
           "jl_guansuo": "关索",
           "jl_shenguanyu": "神关羽",
@@ -6126,6 +6170,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
           'jl_sunluban': '孙鲁班',
           'jl_guohuai': '郭淮',
 
+          "jl_caochun_info": '将灵曹纯，拥有技能【<span style="color:#9933ff"><abbr title="缮甲：▶每名角色的出牌阶段开始时，你有85%的概率可以摸2~4张牌，然后若此时是你的回合内，你可以视为使用一张【杀】，此【杀】不能被响应且伤害+1~2。（每轮限3次）"><ins>缮甲</ins></abbr></span>】、【<span style="color:#9933ff"><abbr title="骁锐：▶当你对其他角色造成伤害时，你有90%的概率随机获得其1~4张牌且此伤害+1~4（每回合限触发4次）"><ins>骁锐</ins></abbr></span>】',
           "jl_zhangqiying_info": '将灵张琪瑛，拥有技能【<span style="color:#9933ff"><abbr title="法箓：▶结束阶段，你有89.2%的概率随机获得牌堆中四种花色的牌各一张。若你因此获得了点数相同的牌，你回复1点体力并对至多两名其他角色各造成1点伤害。"><ins>法箓</ins></abbr></span>】、【<span style="color:#9933ff"><abbr title="点化：▶准备阶段，你有89.2%的概率可以观看牌堆顶的四张牌，然后以任意顺序放回牌堆顶。"><ins>点化</ins></abbr></span>】、【<span style="color:#9933ff"><abbr title="真仪：▶当你对其他角色造成伤害时，你有84.2%的概率令此伤害+1，然后随机获得其一张牌；当你受到其他角色造成的伤害时，你有84.2%的概率防止此伤害，然后你随机弃置伤害来源两张牌。（每个效果每回合各限触发2次）"><ins>真仪</ins></abbr></span>】',
           "jl_zhangfei_info": '将灵张飞，拥有技能【<span style="color:#9933ff"><abbr title="咆哮：▶你的出牌阶段开始时，有85%的概率多出1~5张【杀】，且无距离限制。"><ins>咆哮</ins></abbr></span>】、【<span style="color:#9933ff"><abbr title="替身：▶你受到伤害时，你有70%的概率回复1点体力并摸三张牌（每轮限3次）。"><ins>替身</ins></abbr></span>】',
           "jl_shenguanyu_info": '将灵神关羽，拥有技能【<span style="color:#9933ff"><abbr title="武神：▶准备阶段，你有85%的概率视为对至多3名角色各使用一张【杀】。此【杀】每次对目标角色造成伤害后你摸一张牌。"><ins>武神</ins></abbr></span>】、【<span style="color:#9933ff"><abbr title="武魂：▶你的回合外，与你距离1以内的角色受到伤害后，你有90%的概率获得1个“梦魇”标记。此回合结束时，若你有梦魇标记，你可令当前回合角色失去X点体力（X为“梦魇”标记数量且最多为5）。"><ins>武魂</ins></abbr></span>】',
