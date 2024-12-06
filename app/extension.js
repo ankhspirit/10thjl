@@ -2737,7 +2737,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 locked: true,
                 prompt2: '摸X张牌、此阶段计算与其他角色的距离-X、此阶段可以多使用X张【杀】，且【杀】的伤害+X（此阶段限触发2次），X为场上女性角色数+1。',
                 trigger: {
-                  player: "phaseBegin",
+                  player: "phaseUseBegin",
                 },
                 filter: function() {
                   var numa = Math.random();
