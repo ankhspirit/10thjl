@@ -380,7 +380,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
     game.saveConfig('jl_lingzhu', 0)
   }
 
-
   jl_config.damageAnimation = function(name, trigger, event) {
     var b = trigger.player.offsetTop;
     var c = trigger.source.offsetTop;
@@ -420,7 +419,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
       event.finish();
     };
   }
-
 
   jl_config.setchuzhan = function(name) {
     let img = document.createElement("img");
@@ -467,7 +465,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
       img.style.pointerEvents = "none";
       img.style.left = "calc(" + (f - g) + "px)";
       ui.arena.appendChild(img);
-      game.playThisAudio('skill');
+      game.playThisAudio('effect/skill');
       if (lib.config.jl_value[lib.config.jl_gmczjl]['quality'] == 's') {
         setTimeout(() => {
           ui.arena.removeChild(img);
@@ -478,13 +476,11 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
         }, 1900);
       }
     }
-    ;
   }
   jl_config.chooseButton = function(skills, player) {
     let num = game.players.length - 1;
     var event = _status.event;
-    if (!event._result)
-      event._result = {};
+    if (!event._result) event._result = {};
     event._result.skills = [];
     event._result.bool = false;
     var h3 = document.createElement('h3');
@@ -496,10 +492,10 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
     table.style.margin = '0';
     table.style.width = '100%';
     table.style.position = 'relative';
-    for (var i = 0; i < skills.length; i++) {///////////
+    for (var i = 0; i < skills.length; i++) {
       if (!lib.config.jl_value[skills[i].slice(3)]['gain']) continue;
       var td = ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
-      td.link = skills[i];///////////
+      td.link = skills[i];
       table.appendChild(td);
       td.innerHTML = '<span>' + get.translation(skills[i]) + '</span>';
       td.addEventListener(lib.config.touchscreen ? 'touchend' : 'click', function() {
@@ -540,9 +536,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
     game.countChoose();
   };
 
-
   jl_config.gameOver = function() {
-
     var a1 = [0, 1].randomGet();
     var a2 = [0, 1, 2].randomGet();
     var a3 = [0, 1].randomGet();
@@ -576,7 +570,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
     Object.assign(img_jl_jl1.style, {
       width: '50px',
       height: '50px',
-
     });
     Object.assign(img_jl_jl2.style, {
       width: '50px',
@@ -590,9 +583,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
     Object.assign(img_jl_jl4.style, {
       width: '50px',
       height: '50px',
-
     });
-
 
     let jl_jl1 = document.createElement('div');
     let jl_jl2 = document.createElement('div');
@@ -607,25 +598,21 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
       height: 'auto',
       position: 'relative',
       intro: '唤灵宝箱',
-
     });
     Object.assign(jl_jl2.style, {
       width: 'auto',
       height: 'auto',
       position: 'relative'
-
     });
     Object.assign(jl_jl3.style, {
       width: 'auto',
       height: 'auto',
       position: 'relative'
-
     });
     Object.assign(jl_jl4.style, {
       width: 'auto',
       height: 'auto',
       position: 'relative'
-
     });
 
     let jl_jl1_text = document.createElement('div');
@@ -721,7 +708,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             node.addEventListener('transitionend', e2 => {
               if (e2 === e) return;
 
-
               if (a1 + a2 + a3 + a4 == 0) {
                 text.innerText = '很遗憾没有收获';
                 text.style.opacity = 1;
@@ -745,10 +731,8 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
     }, 800);
   };
 
-
   class jl {
     constructor() {
-
       ui.backgroundMusic.src = jl_config['layoutPath'] + 'audio/bgm/linanchuyu.mp3';
       this.jl_character = [];
       this.Image = ui.background.style.backgroundImage;
@@ -787,7 +771,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             } else jl.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/silhouette/' + i + '.png' + ')';
             jl.dataset.jlname = i;
           }
-          ;
         }
       }
       for (let i in jl_config.jlname) {
@@ -800,8 +783,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             } else jl.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/silhouette/' + i + '.png' + ')';
             jl.dataset.jlname = i;
           }
-          ;
-
         }
       }
       for (let i in jl_config.jlname) {
@@ -814,8 +795,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             } else jl.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/silhouette/' + i + '.png' + ')';
             jl.dataset.jlname = i;
           }
-          ;
-
         }
       }
       for (let i in jl_config.jlname) {
@@ -828,15 +807,13 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             } else jl.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/silhouette/' + i + '.png' + ')';
             jl.dataset.jlname = i;
           }
-          ;
-
         }
       }
       for (let i of this.jl_character) {
         i.addEventListener('click', () => {
           let name = i.dataset.jlname;
           let tmp = '';
-          game.playThisAudio('click');
+          game.playThisAudio('effect/click');
           for (let j in jl_config.jlname[name]['skill']) {
             tmp += j + jl_config.jlname[name]['skill'][j] + '<br><br>'
           }
@@ -851,10 +828,8 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
           } else {
             this.duigou1.hide();
           }
-          ;
         })
       }
-
 
       this.createall = function() {
         for (let i of this.jl_character) {
@@ -870,7 +845,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               } else jl.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/silhouette/' + i + '.png' + ')';
               jl.dataset.jlname = i;
             }
-            ;
           }
         }
         for (let i in jl_config.jlname) {
@@ -883,8 +857,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               } else jl.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/silhouette/' + i + '.png' + ')';
               jl.dataset.jlname = i;
             }
-            ;
-
           }
         }
         for (let i in jl_config.jlname) {
@@ -897,8 +869,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               } else jl.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/silhouette/' + i + '.png' + ')';
               jl.dataset.jlname = i;
             }
-            ;
-
           }
         }
         for (let i in jl_config.jlname) {
@@ -911,13 +881,11 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               } else jl.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/silhouette/' + i + '.png' + ')';
               jl.dataset.jlname = i;
             }
-            ;
-
           }
         }
         for (let i of this.jl_character) {
           i.addEventListener('click', () => {
-            game.playThisAudio('click');
+            game.playThisAudio('effect/click');
             let name = i.dataset.jlname;
             let tmp = '';
             for (let j in jl_config.jlname[name]['skill']) {
@@ -934,7 +902,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             } else {
               this.duigou1.hide();
             }
-            ;
           })
         }
       }
@@ -953,12 +920,11 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               } else jl.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/silhouette/' + i + '.png' + ')';
               jl.dataset.jlname = i;
             }
-            ;
           }
         }
         for (let i of this.jl_character) {
           i.addEventListener('click', () => {
-            game.playThisAudio('click');
+            game.playThisAudio('effect/click');
             let name = i.dataset.jlname;
             let tmp = '';
             for (let j in jl_config.jlname[name]['skill']) {
@@ -975,35 +941,34 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             } else {
               this.duigou1.hide();
             }
-            ;
           })
         }
       }
 
       this.jlrank1.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         this.createall();
       });
       this.jlrank2.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         this.createjl('s');
       });
       this.jlrank3.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         this.createjl('a');
       });
       this.jlrank4.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         this.createjl('b');
       });
       this.jlrank5.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         this.createjl('c');
       });
       this.show = ui.create.div('.show', this.manual);
       this.showtext = ui.create.div('.showtext', this.show, '唤灵台');
       this.show.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         new hl();
       });
 
@@ -1084,7 +1049,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
       this.shadow3.hide();
 
       this.button1.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         if (lib.config.jl_value[beizhan]['quality'] == 's') {
           this.buzu = ui.create.div('.buzu', this.manual, 'S级将灵无法转生')
           this.buzu.id = 'buzu';
@@ -1114,10 +1079,9 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
           this.tips.show();
           this.queding1.show();
         }
-        ;
       });
       this.button2.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         if (lib.config.jl_value[beizhan]['quality'] == 's') {
           this.buzu = ui.create.div('.buzu', this.manual, 'S级将灵无法转生')
           this.buzu.id = 'buzu';
@@ -1147,10 +1111,9 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
           this.tips.show();
           this.queding2.show();
         }
-        ;
       });
       this.queding1.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         game.saveConfig('jl_zsd', lib.config.jl_zsd - 10);
         this.zsd1.innerHTML = '(' + lib.config.jl_zsd + '/10)';
         lib.config.jl_value[beizhan]['gain'] = false;
@@ -1165,7 +1128,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
         this.shadow1.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/action/' + beizhan + '1.gif' + ')';
         this.shadow1.show();
         setTimeout(function() {
-          game.playThisAudio('zhuansheng');
+          game.playThisAudio('effect/zhuansheng');
           this.shadow1.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/action/' + name + '1.gif' + ')';
           this.shadow2.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/img/zhuansheng1.gif' + ')';
           this.shadow3.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/img/reward1.png' + ')';
@@ -1184,14 +1147,12 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             this.shadow1.hide();
             this.shadow3.hide();
             this.shadow.hide();
-
           });
         }, 1000);
-
       });
 
       this.queding2.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         game.saveConfig('jl_gjzsd', lib.config.jl_gjzsd - 5);
         this.zsd2.innerHTML = '(' + lib.config.jl_gjzsd + '/5)';
         lib.config.jl_value[beizhan]['gain'] = false;
@@ -1206,13 +1167,12 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
           game.saveConfig('jl_value', lib.config.jl_value);
           game.saveConfig('jl_gmczjl', name);
         }
-        ;
 
         this.tips.hide();
         this.shadow1.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/action/' + beizhan + '1.gif' + ')';
         this.shadow1.show();
         setTimeout(function() {
-          game.playThisAudio('zhuansheng');
+          game.playThisAudio('effect/zhuansheng');
           this.shadow1.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/action/' + name + '1.gif' + ')';
           this.shadow2.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/img/zhuansheng1.gif' + ')';
           this.shadow3.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/img/reward1.png' + ')';
@@ -1233,23 +1193,21 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             this.shadow.hide();
           });
         }, 1000);
-
       });
 
       this.quxiao.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         this.tips.hide();
         this.shadow.hide();
       });
 
       this.jl_list.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         this.detail.hide();
       });
 
-
       this.changzhukuang.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         if (lib.config.jl_juneichangzhu == 1) {
           game.saveConfig('jl_juneichangzhu', '0');
           this.duigou2.hide();
@@ -1260,7 +1218,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
       });
 
       this.damagekuang.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         if (lib.config.jl_gongji == 1) {
           game.saveConfig('jl_gongji', '0');
           this.duigou3.hide();
@@ -1271,7 +1229,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
       });
 
       this.chuzhankuang.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         if (beizhan == lib.config.jl_gmczjl) {
           this.duigou1.hide();
           game.saveConfig('jl_gmczjl', '0');
@@ -1285,16 +1243,15 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             this.buzu.remove();
           }, 800);
         }
-        ;
       });
 
       this.fanhui.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         this.detail.hide();
       });
 
       this.mj.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         var a = lib.config.jl_gmczjl;
         if (a != 'shenlvbu') {
           this.pmj.show();
@@ -1340,7 +1297,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
         this.kaichangbai.hide();
         this.rukou.show();
         var a = lib.config.jl_gmczjl;
-        game.playThisAudio('qlin');
+        game.playThisAudio('effect/qlin');
         if (a != 'shenlvbu') {
           game.saveConfig('jl_gmlv', '5');
           document.getElementById('tishi').innerHTML = '获得麒麟之力';
@@ -1356,7 +1313,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
         this.kaichangbai.hide();
         this.rukou.hide();
         var a = lib.config.jl_gmczjl;
-        game.playThisAudio('ql');
+        game.playThisAudio('effect/ql');
         if (a != 'shenlvbu') {
           game.saveConfig('jl_gmlv', '4');
           document.getElementById('tishi').innerHTML = '获得青龙之力';
@@ -1372,7 +1329,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
         this.kaichangbai.hide();
         this.rukou.hide();
         var a = lib.config.jl_gmczjl;
-        game.playThisAudio('bh');
+        game.playThisAudio('effect/bh');
         if (a != 'shenlvbu') {
           game.saveConfig('jl_gmlv', '3');
           document.getElementById('tishi').innerHTML = '获得白虎之力';
@@ -1388,7 +1345,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
         this.kaichangbai.hide();
         this.rukou.hide();
         var a = lib.config.jl_gmczjl;
-        game.playThisAudio('zq');
+        game.playThisAudio('effect/zq');
         if (a != 'shenlvbu') {
           game.saveConfig('jl_gmlv', '2');
           document.getElementById('tishi').innerHTML = '获得朱雀之力';
@@ -1404,7 +1361,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
         this.rukou.hide();
         this.kaichangbai.hide();
         var a = lib.config.jl_gmczjl;
-        game.playThisAudio('xw');
+        game.playThisAudio('effect/xw');
         if (a != 'shenlvbu') {
           game.saveConfig('jl_gmlv', '1');
           document.getElementById('tishi').innerHTML = '获得玄武之力';
@@ -1435,7 +1392,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
         ui.backgroundMusic.src = jl_config['layoutPath'] + 'audio/bgm/lingshan.mp3';
       });
 
-
       lib.cheat.i();
       if (!loadCSS) {
         lib.init.css(jl_config['layoutPath'], 'extension');
@@ -1443,7 +1399,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
       }
 
       this.close.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         this.closeDialog()
       });
 
@@ -1455,7 +1411,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
 
     closeDialog() {
       if (!lib.config.dev) {
-
         delete window.cheat;
         delete window.game;
         delete window.ui;
@@ -1476,7 +1431,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
 
   class hl {
     constructor() {
-
       this.hl = ui.create.div('.hl');
       this.hl_top = ui.create.div('.hl_top', this.hl);
       this.hl_close = ui.create.div('.hl_close', this.hl_top);
@@ -1503,19 +1457,19 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
       this.dialog = ui.create.dialog();
 
       this.hl_button1.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         if (parseInt(lib.config.jl_hljh) > 0) {
-          game.playThisAudio('huanling');
+          game.playThisAudio('effect/huanling');
           var name = s_character[Math.floor((Math.random() * s_character.length))];
           lib.config.jl_value[name]['sp'] = lib.config.jl_value[name]['sp'] + 1;
           game.saveConfig('jl_value', lib.config.jl_value);
           game.saveConfig('jl_hljh', parseInt(lib.config.jl_hljh - 1));
           this.hl_jinhe.innerHTML = lib.config.jl_hljh;
-          this.hl_reward = ui.create.div('.hl_reward', this.hl);
-          this.stuff = ui.create.div('.stuff', this.hl_reward);
+          const hl_reward = ui.create.div('.hl_reward', this.hl);
+          this.stuff = ui.create.div('.stuff', hl_reward);
           this.daoju = ui.create.div('.daoju', this.stuff);
           this.daoju.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/sp/' + 'sp_' + name + '.png' + ')';
-          this.hl_reward.addEventListener('click', () => this.hl_reward.remove());
+          hl_reward.addEventListener('click', () => hl_reward.remove());
         } else {
           this.tishis = ui.create.div('.tishi', this.hl, '唤灵宝箱不足');
           this.tishis.id = 'tishis';
@@ -1523,27 +1477,24 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             this.tishis.remove();
           }, 800);
         }
-        ;
-
-
       });
 
       this.hl_button2.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         if (parseInt(lib.config.jl_hljh) > 9) {
           game.saveConfig('jl_hljh', parseInt(lib.config.jl_hljh - 10));
           this.hl_jinhe.innerHTML = lib.config.jl_hljh;
-          this.hl_reward = ui.create.div('.hl_reward', this.hl);
-          this.stuff = ui.create.div('.stuff', this.hl_reward);
+          const hl_reward = ui.create.div('.hl_reward', this.hl);
+          this.stuff = ui.create.div('.stuff', hl_reward);
           for (let i = 0; i < 10; i++) {
-            game.playThisAudio('huanling');
+            game.playThisAudio('effect/huanling');
             var name = s_character[Math.floor((Math.random() * s_character.length))];
             lib.config.jl_value[name]['sp'] = lib.config.jl_value[name]['sp'] + 1;
             this.daoju = ui.create.div('.daoju', this.stuff);
             this.daoju.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/sp/' + 'sp_' + name + '.png' + ')';
           }
-          this.hl_reward.addEventListener('click', () => this.hl_reward.remove());
-          game.playThisAudio('gongxi');
+          hl_reward.addEventListener('click', () => hl_reward.remove());
+          game.playThisAudio('effect/gongxi');
           game.saveConfig('jl_value', lib.config.jl_value);
         } else {
           this.tishis = ui.create.div('.tishi', this.hl, '唤灵宝箱不足');
@@ -1552,17 +1503,15 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             this.tishis.remove();
           }, 800);
         }
-        ;
       });
 
-
       this.hl_shop.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         new jlshop();
       });
 
       this.lantern2.addEventListener('dblclick', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         this.tishis = ui.create.div('.tishi', this.hl, '作弊成功，获得唤灵锦盒*50、转生丹*50、高级转生丹*50');
         game.saveConfig('jl_zsd', parseInt(lib.config.jl_zsd + 50));
         game.saveConfig('jl_gjzsd', parseInt(lib.config.jl_gjzsd + 50));
@@ -1576,12 +1525,12 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
 
       this.jl_recover.addEventListener('click', () => {
         if (lib.config.jl_cheat != 0) {
-          game.playThisAudio('click');
+          game.playThisAudio('effect/click');
           var hl_wait = 0;
           this.tishis = ui.create.div('.tishi', this.hl, '是否初始化数据，同意请双击，不同意5秒后自动消失');
           this.tishis.id = 'tishis';
           this.tishis.addEventListener('dblclick', () => {
-            game.playThisAudio('click');
+            game.playThisAudio('effect/click');
             game.saveConfig('jl_value', jl_valueres);
             game.saveConfig('jl_zsd', 5);
             game.saveConfig('jl_gjzsd', 5);
@@ -1602,20 +1551,17 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             }
           }, 5000);
         }
-        ;
-
       });
 
       this.hl_guashi.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         this.explanation.show();
       });
 
       this.explanation.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         this.explanation.hide();
       });
-
 
       if (!loadCSS) {
         lib.init.css(jl_config['layoutPath'], 'extension');
@@ -1623,7 +1569,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
       }
 
       this.hl_close.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         this.closeDialog()
       });
       ui.window.appendChild(this.hl);
@@ -1631,7 +1577,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
 
     closeDialog() {
       if (!lib.config.dev) {
-
         delete window.cheat;
         delete window.game;
         delete window.ui;
@@ -1641,14 +1586,13 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
         delete window._status;
       }
       this.hl.remove();
-
       document.getElementById('jl_jinhe').innerHTML = lib.config.jl_hljh;
     }
   }
 
   class jlshop {
     constructor() {
-      var commodity = ['shenzhouyu', 'shenzhaoyun', 'shencaocao', 'zhugeguo', 'nianshou', 'caoying', 'lingju', 'xiaosha', 'huaman', 'wuliuqi', 'guansuo', 'shenguanyu', 'zhangyi', 'sunluban', 'guohuai'];
+      var commodity = ['caochun', 'zhangqiying', 'shenzhouyu', 'shenzhaoyun', 'shencaocao', 'zhugeguo', 'nianshou', 'caoying', 'lingju', 'xiaosha', 'huaman', 'wuliuqi', 'guansuo', 'shenguanyu', 'zhangyi', 'sunluban', 'guohuai'];
       var ccommodity = ['zhangyi', 'sunluban', 'guohuai']
       this.shop = ui.create.div('.shop');
       this.shop_top = ui.create.div('.shop_top', this.shop);
@@ -1694,7 +1638,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
       }
       for (let i of this.buy_button) {
         i.addEventListener('click', () => {
-          game.playThisAudio('click');
+          game.playThisAudio('effect/click');
           if (!ccommodity.contains(i.dataset.buyname)) {
             if (lib.config.jl_value[i.dataset.buyname]['sp'] > 19) {
               lib.config.jl_value[i.dataset.buyname]['sp'] = lib.config.jl_value[i.dataset.buyname]['sp'] - 20;
@@ -1703,8 +1647,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               game.saveConfig('jl_value', lib.config.jl_value);
               document.getElementById(numberid[i.dataset.buynumber]).innerHTML = '(' + lib.config.jl_value[i.dataset.buyname]['sp'] + '/20)';
 
-
-              game.playThisAudio('zhuansheng');
+              game.playThisAudio('effect/zhuansheng');
               this.shadowss.show();
               this.shadow2ss.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/img/zhuansheng1.gif' + ')';
               this.shadow3ss.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/img/reward1.png' + ')';
@@ -1733,8 +1676,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 game.saveConfig('jl_lingzhu', parseInt(lib.config.jl_lingzhu) - 1);
                 this.shop_jinhe.innerHTML = lib.config.jl_lingzhu;
 
-
-                game.playThisAudio('zhuansheng');
+                game.playThisAudio('effect/zhuansheng');
                 this.shadowss.show();
                 this.shadow2ss.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/img/zhuansheng1.gif' + ')';
                 this.shadow3ss.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/img/reward1.png' + ')';
@@ -1763,7 +1705,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 this.buzuss.remove();
               }, 800);
             }
-            ;
           } else {
             if (parseInt(lib.config.jl_hljh) > 0) {
               game.saveConfig('jl_hljh', parseInt(lib.config.jl_hljh - 1));
@@ -1780,7 +1721,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               this.shadow1ss.show();
               this.shadow2ss.show();
               this.shadow3ss.show();
-              game.playThisAudio('zhuansheng');
+              game.playThisAudio('effect/zhuansheng');
               setTimeout(() => {
                 this.shadow3ss.style.backgroundImage = 'url(' + jl_config['layoutPath'] + 'image/img/reward2.png' + ')';
                 this.shadowss.addEventListener('click', () => {
@@ -1795,16 +1736,12 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 this.buzuss.remove();
               }, 800);
             }
-            ;
-
           }
-
         })
       }
 
       this.oldDialog = _status.event.dialog;
       this.dialog = ui.create.dialog();
-
 
       if (!loadCSS) {
         lib.init.css(jl_config['layoutPath'], 'extension');
@@ -1812,7 +1749,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
       }
 
       this.shop_close.addEventListener('click', () => {
-        game.playThisAudio('click');
+        game.playThisAudio('effect/click');
         this.closeDialog()
       });
       ui.window.appendChild(this.shop);
@@ -1820,7 +1757,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
 
     closeDialog() {
       if (!lib.config.dev) {
-
         delete window.cheat;
         delete window.game;
         delete window.ui;
@@ -1832,15 +1768,12 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
       this.shop.remove();
       document.getElementById('jl_jinhe').innerHTML = lib.config.jl_hljh;
       document.getElementById('hl_jinhe').innerHTML = lib.config.jl_hljh;
-
     }
   }
-
 
   return {
     name: "将灵重置版",
     content: function(config, pack) {
-
       let over = game.over;
       game.over = function() {
         over.apply(this, arguments);
@@ -1858,9 +1791,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             return lib.skill._jl_gmjl.storage != true
           },
           content: function() {
-
             'step 0'
-
             let q = lib.config.jl_gmczjl;
             let jl_gmjl = lib.config[jl_config.extensionName + 'jl_gmjl'];
             let jl_add = lib.config[jl_config.extensionName + 'jl_add'];
@@ -1877,7 +1808,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             lib.skill._jl_gmjl.storage = true;
             'step 1'
             if (event.jl_add == 'choose') {
-
               if (game.players[event.jl_num] == game.me) {
                 game.me.addSkill('jl_' + lib.config.jl_gmczjl)
               } else if (event.jl_gmjl == 'all') {
@@ -1934,8 +1864,9 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                       continue;
                     }
                     if (i.side != undefined) {
-                      if (i.side == friend)
+                      if (i.side == friend) {
                         i.addSkill(event.jl_skill.randomGet());
+                      }
                     }
                   }
                   break;
@@ -1945,7 +1876,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             }
             if (event.jl_gmjl == 'all') {
               switch (event.jl_add) {
-
                 case 'same': {
                   for (let i of gameplayer) {
                     i.addSkill('jl_' + event.q);
@@ -2004,8 +1934,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
           },
         };
       }
-      ;
-
 
       lib.skill._jl_lva = {
         trigger: {
@@ -2038,8 +1966,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
           } else {
             if (card) player.chooseUseTarget(card, 'nopopup', true);
           }
-          ;
-
         },
         group: "_jl_lvb_a",
         subSkill: {
@@ -2085,7 +2011,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
           } else {
             if (card) player.chooseUseTarget(card, 'nopopup', true);
           }
-          ;
         },
         group: "_jl_lvc_a",
         subSkill: {
@@ -2131,7 +2056,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
           } else {
             if (card) player.chooseUseTarget(card, 'nopopup', true);
           }
-          ;
         },
         group: "_jl_lvd_a",
         subSkill: {
@@ -2182,7 +2106,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
           } else {
             if (card) player.chooseUseTarget(card, 'nopopup', true);
           }
-          ;
         },
         group: "_jl_lve_a",
         subSkill: {
@@ -2244,7 +2167,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
         }
       }
 
-
       lib.skill._reward = {
         trigger: {
           global: "gameOver",
@@ -2290,7 +2212,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               else if (player == game.me && lib.config.jl_gmczjl != 'shenlvbu') {
                 jl_config.damageAnimation(lib.config.jl_gmczjl, trigger, event);
               }
-              ;
             }
           }
         },
@@ -2314,7 +2235,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               jl_config.setchuzhan();
               jl_config.settexiao();
             }
-            ;
           }
         }
 
@@ -2322,13 +2242,16 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
     },
     config: {
       "jl": {
-        "name": "<b><p align=center><span style=\"font-size:18px\">▶【查看将灵】</span></b>",
+        "name": "<b><p align=center><span style=\"font-size:18px\">【查看将灵】</span></b>",
         "clear": true,
         onclick: function() {
           new jl();
         },
       },
-
+      "jl_version": {
+        "name": "<b><span style='cursor: default'>补丁版本：补丁8</span></b>",
+        "clear": true,
+      },
 
       "jl_gmjl": {
         name: "将灵出战设置",
@@ -2380,7 +2303,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             delete this.hth_more;
             this.innerHTML = '<div class="hth_menu">▶留言</div>';
           }
-          ;
         },
       },
 
@@ -2432,7 +2354,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             delete this.hth_more;
             this.innerHTML = '<div class="hth_menu">▶推广说明</div>';
           }
-          ;
         },
       },
     },
@@ -2584,7 +2505,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               count8: {},
               count9: {},
             },
-
           },
           jl_zhangqiying: {
             charlotte: true,
@@ -5883,7 +5803,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               if (player == game.me) {
                 jl_config.settexiao();
               }
-              ;
 
             },
           },
@@ -5913,7 +5832,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 if (player == game.me) {
                   jl_config.settexiao();
                 }
-                ;
                 game.playThisAudio('voice/jl_sundeng_kuangbi1');
                 num--;
               } else {
@@ -5946,7 +5864,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               if (player == game.me) {
                 jl_config.settexiao();
               }
-              ;
             },
             ai: {
               maixie: true,
@@ -5975,7 +5892,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 if (player == game.me) {
                   jl_config.settexiao();
                 }
-                ;
                 player.gain(card, 'gain2', 'log');
               } else {
                 player.chat('无牌可得了吗');
@@ -6003,7 +5919,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               if (player == game.me) {
                 jl_config.settexiao();
               }
-              ;
             },
             subSkill: {
               x: {
@@ -6041,7 +5956,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               if (player == game.me) {
                 jl_config.settexiao();
               }
-              ;
               game.playThisAudio('voice/jl_huaxiong_yaowu1');
             }
           },
@@ -6067,7 +5981,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               if (player == game.me) {
                 jl_config.settexiao();
               }
-              ;
               "step 1"
               trigger.source.chooseToDiscard(true);
             },
@@ -6091,7 +6004,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               if (player == game.me) {
                 jl_config.settexiao();
               }
-              ;
               player.addTempSkill('jl_zhangyi_buff', { player: 'phaseUseAfter' });//
 
             },
@@ -6126,7 +6038,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               if (player == game.me) {
                 jl_config.settexiao();
               }
-              ;
               trigger.num--;
             },
           },
@@ -6149,7 +6060,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                 jl_config.settexiao();
 
               }
-              ;
               game.playThisAudio('voice/jl_guohuai_jingce1');
               player.draw(2);
             },
@@ -6158,7 +6068,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
         translate: {
           "jl_dj": "将灵等阶",
           "jl_dj_info": "",
-
 
           "jl_caochun": "曹纯",
           "jl_zhangqiying": "张琪瑛",
