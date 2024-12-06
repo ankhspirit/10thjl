@@ -2158,6 +2158,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
     },
     editable: false,
     precontent: function(config) {
+      game.showExtensionChangeLog(`修复荀攸智愚报错`, "将灵重置版");
       game.playThisAudio = function(filePathInAudioDir, audioType, playAudioCallback) {
         if (lib.config.background_speak) {
           game.playAudio('..', 'extension', '将灵重置版', 'audio', filePathInAudioDir);
@@ -2279,7 +2280,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
         },
       },
       "jl_version": {
-        "name": "<b><span style='cursor: default'>补丁版本：补丁9</span></b>",
+        "name": "<b><span style='cursor: default'>补丁版本：补丁10</span></b>",
         "clear": true,
       },
 
@@ -6132,7 +6133,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               player: "damageEnd",
             },
             filter: function(event, player) {
-              if (!trigger.player) return false;
+              if (!event.player) return false;
               var numa = Math.random();
               return event.source && numa < 0.85;
             },
@@ -6144,7 +6145,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               if (player == game.me) {
                 jl_config.settexiao();
               }
-              "step 1"
               trigger.source.chooseToDiscard(true);
             },
           },
@@ -6311,7 +6311,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
       author: "",
       diskURL: "",
       forumURL: "",
-      version: "1.0.0",
+      version: "1.0.10",
     },
     files: {
       "character": [],
