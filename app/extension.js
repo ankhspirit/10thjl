@@ -3803,7 +3803,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   }
                   ;
                   player.line(_status.currentPhase, 'gold');
-                  player.logSkill('jl_shenzhaoyun_longhun', _status.currentPhase);//ppppppppppppppppppppppppppppppppppp
+                  player.logSkill('jl_shenzhaoyun_longhun1', _status.currentPhase);//ppppppppppppppppppppppppppppppppppp
                   player.gainPlayerCard(_status.currentPhase, 'he', [1, 2]);
                 },
                 check: function(event, player) {
@@ -4418,7 +4418,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
                   } else event.finish();
                   'step 2'
                   player.line(event.targets[event.num], 'green');
-                  player.logSkill('jl_luxun_Lianying', event.targets[event.num]);
+                  player.logSkill('jl_luxun_lianying', event.targets[event.num]);
                   event.targets[event.num].draw();
                   'step 3'
                   var numc = [1, 2].randomGet();
