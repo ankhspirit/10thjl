@@ -347,8 +347,17 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
     game.saveConfig('jl_value', jl_valueres);
     game.saveConfig('jl_gmczjl', 0);
     game.saveConfig('jl_cheat', 0);
-  } else if (!Object.keys(lib.config.jl_value).contains("caochun")) {
-    lib.config.jl_value["caochun"] = { "gain": true, "sp": 0, "quality": "s" };
+  }
+  const config_jl_value = lib.config.jl_value;
+  let config_jl_value_updated = false;
+  for (const jlName in jl_valueres) {
+    if (config_jl_value[jlName] === undefined) {
+      config_jl_value[jlName] = jl_valueres[jlName];
+      config_jl_value_updated = true;
+    }
+  }
+  if (config_jl_value_updated === true) {
+    game.saveConfig('jl_value', config_jl_value);
   }
 
   if (lib.config.jl_bugnum != 0) {
