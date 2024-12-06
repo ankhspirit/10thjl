@@ -6,13 +6,21 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
   let loadCSS = false;
   let extensionName = 'extension_将灵重置版_';
   jl_config.extensionName = extensionName;
-  const s_character = ['shenzhouyu', 'shenzhaoyun', 'shencaocao', 'zhugeguo', 'nianshou', 'caoying', 'lingju', 'xiaosha', 'huaman', 'wuliuqi', 'shenguanyu', 'guansuo', 'zhangqiying', 'caochun'];
+  const s_character = ['shenzhouyu', 'shenzhaoyun', 'shencaocao', 'zhugeguo', 'nianshou', 'caoying', 'lingju', 'xiaosha', 'huaman', 'wuliuqi', 'shenguanyu', 'guansuo', 'zhangqiying', 'caochun', 'zhouyi'];
   const a_character = ['diaochan', 'luxun', 'guojia', 'xiaoqiao', 'jiangwei', 'lvbu', 'zhugeliang', 'zhurong', 'zhoufei', 'xizhicai', 'sunshangxiang', 'menghuo', 'zhangxingcai', 'zhangfei'];
   const b_character = ['guanyinping', 'sundeng', 'caorui', 'guohuanghou', 'yuanshao', 'huaxiong', 'xunyou'];
   // this.c_character={'zhangyi':'张嶷','sunluban':'孙鲁班','guohuai':'郭淮'};
   // this.jl_config.jlname={
 
   jl_config.jlname = {
+    "zhouyi": {
+      "name": "周夷",
+      "des": "",
+      "skill": {
+        "【逐寇】": "▶每回合限一次，当你于一名角色的出牌阶段造成伤害后，你有90%的概率摸X张牌并回复1点体力（X为本回合你已使用的牌数）。",
+        "【氓情】": "▶准备阶段，你有85%的概率选择一项（每有一个受伤角色可多选一项）：1.对一名角色造成2点伤害；2.摸2~3张牌；3.本回合出牌阶段可以多使用3张【杀】；4.本回合手牌上限+4。"
+      }
+    },
     "caochun": {
       "name": "曹纯",
       "des": "",
@@ -299,7 +307,8 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
   }
   // this.jl_valueres={
   let jl_valueres = {
-    "caochun": { "gain": true, "sp": 0, "quality": "s" },
+    "zhouyi": { "gain": true, "sp": 0, "quality": "s" },
+    "caochun": { "gain": false, "sp": 0, "quality": "s" },
     "zhangqiying": { "gain": false, "sp": 0, "quality": "s" },
     "shenzhouyu": { "gain": false, "sp": 0, "quality": "s" },
     "shenzhaoyun": { "gain": false, "sp": 0, "quality": "s" },
@@ -359,6 +368,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
   if (config_jl_value_updated === true) {
     game.saveConfig('jl_value', config_jl_value);
   }
+  lib.config.jl_value["zhouyi"] = { "gain": true, "sp": 0, "quality": "s" };
 
   if (lib.config.jl_bugnum != 0) {
     game.saveConfig('jl_zsd', 15);
@@ -435,11 +445,18 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
     img.width = 0.75 * d;
     let f = game.me.offsetLeft;
     let g = game.me.offsetWidth;
-    img.style.left = "calc(" + (f - g) + "px)";
-    ui.arena.appendChild(img);
+    if (lib.config['extension_十周年UI_rightLayout']) {
+      img.style.left = "calc(" + (f - g) + "px)";
+    } else {
+      img.style.left = "calc(" + (f + g) + "px)";
+    }
+    img.onload = function() {
+      ui.arena.appendChild(img);
+      jl_config.settexiao("chuzhan");
+    }
   }
 
-  jl_config.settexiao = function() {
+  jl_config.settexiao = function(type) {
     if (lib.config.jl_juneichangzhu == 1 & lib.config.jl_gmczjl != 0 & lib.config.jl_gmczjl != 'shenlvbu') {
       let img = document.createElement("img");
       img.id = 'jl_texiao';
@@ -463,16 +480,24 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
       let f = game.me.offsetLeft;
       let g = game.me.offsetWidth;
       img.style.pointerEvents = "none";
-      img.style.left = "calc(" + (f - g) + "px)";
+      if (type === "chuzhan" && lib.config['extension_十周年UI_rightLayout']) {
+        img.style.left = "calc(" + (f - g) + "px)";
+      } else {
+        img.style.left = "calc(" + (f + g) + "px)";
+      }
       ui.arena.appendChild(img);
       game.playThisAudio('effect/skill');
       if (lib.config.jl_value[lib.config.jl_gmczjl]['quality'] == 's') {
         setTimeout(() => {
-          ui.arena.removeChild(img);
+          if (document.querySelector("#jl_texiao")) {
+            ui.arena.removeChild(img);
+          }
         }, 1600);
       } else {
         setTimeout(() => {
-          ui.arena.removeChild(img);
+          if (document.querySelector("#jl_texiao")) {
+            ui.arena.removeChild(img);
+          }
         }, 1900);
       }
     }
@@ -738,6 +763,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
       this.Image = ui.background.style.backgroundImage;
       this.manual = ui.create.div('.jl');
       this.menu = ui.create.div('.menu', this.manual);
+      this.back = ui.create.div('.jl_back', this.menu);
       this.jl_baiyin = ui.create.div('.jl_baiyin', this.menu, '7290');
       this.jl_huangjin = ui.create.div('.jl_huangjin', this.menu, '3651');
       this.jl_jinhe = ui.create.div('.jl_jinhe', this.menu);
@@ -746,7 +772,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
       this.mj = ui.create.div('.mj', this.manual);
       this.pattern = ui.create.div('.pattern', this.manual);
       this.pattern.id = ('pattern');
-      this.close = ui.create.div('.close', this.menu);
+      this.close = ui.create.div('.jl_close', this.menu);
       this.oldDialog = _status.event.dialog;
       this.dialog = ui.create.dialog();
       this.seename = ui.create.div('.name', this.manual);
@@ -1398,6 +1424,11 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
         loadCSS = true;
       }
 
+      this.back.addEventListener('click', () => {
+        game.playThisAudio('effect/click');
+        this.closeDialog()
+      });
+
       this.close.addEventListener('click', () => {
         game.playThisAudio('effect/click');
         this.closeDialog()
@@ -1592,7 +1623,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
 
   class jlshop {
     constructor() {
-      var commodity = ['caochun', 'zhangqiying', 'shenzhouyu', 'shenzhaoyun', 'shencaocao', 'zhugeguo', 'nianshou', 'caoying', 'lingju', 'xiaosha', 'huaman', 'wuliuqi', 'guansuo', 'shenguanyu', 'zhangyi', 'sunluban', 'guohuai'];
+      var commodity = ['zhouyi', 'caochun', 'zhangqiying', 'shenzhouyu', 'shenzhaoyun', 'shencaocao', 'zhugeguo', 'nianshou', 'caoying', 'lingju', 'xiaosha', 'huaman', 'wuliuqi', 'guansuo', 'shenguanyu', 'zhangyi', 'sunluban', 'guohuai'];
       var ccommodity = ['zhangyi', 'sunluban', 'guohuai']
       this.shop = ui.create.div('.shop');
       this.shop_top = ui.create.div('.shop_top', this.shop);
@@ -2233,7 +2264,6 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
               confirm('请出战将灵以生效常驻将灵效果或关闭常驻将灵')
             else {
               jl_config.setchuzhan();
-              jl_config.settexiao();
             }
           }
         }
@@ -2249,7 +2279,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
         },
       },
       "jl_version": {
-        "name": "<b><span style='cursor: default'>补丁版本：补丁8</span></b>",
+        "name": "<b><span style='cursor: default'>补丁版本：补丁9</span></b>",
         "clear": true,
       },
 
@@ -2374,6 +2404,139 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
             marktext: "秘",
             intro: {
               name: "圣兽之力",
+            },
+          },
+          jl_zhouyi: {
+            charlotte: true,
+            locked: true,
+            group: [
+              "jl_zhouyi_zhukou",
+              "jl_zhouyi_mangqing",
+            ],
+            subSkill: {
+              zhukou: {
+                name: '逐寇',
+                audio: false,
+                forced: false,
+                locked: true,
+                frequent: true,
+                usable: 1,
+                prompt2: '每回合限一次，当你于一名角色的出牌阶段造成伤害后，你有90%的概率摸X张牌并回复1点体力（X为本回合你已使用的牌数）。',
+                trigger: {
+                  source:'damageSource',
+                },
+                filter: function(event, player) {
+                  const evt = event.getParent("phaseUse");
+                  if(!evt||!evt.player) return false;
+                  if (player.getHistory("sourceDamage", function(event) {
+                    return event.getParent("phaseUse") === evt;
+                  }).indexOf(event) === 0) {
+                    return Math.random() < 0.9;
+                  }
+                },
+                content: function(game, event, current) {
+                  game.playThisAudio('voice/' + event.name + '1');
+                  player.draw(player.getHistory('useCard').length);
+                  player.recover();
+                },
+              },
+              mangqing: {
+                name: '氓情',
+                audio: false,
+                forced: false,
+                locked: true,
+                frequent: true,
+                prompt2: '准备阶段，你有85%的概率选择一项（每有一个受伤角色可多选一项）：1.对一名角色造成2点伤害；2.摸2~3张牌；3.本回合出牌阶段可以多使用3张【杀】；4.本回合手牌上限+4。',
+                trigger: {
+                  player: "phaseZhunbeiBegin",
+                },
+                filter: function(event, player) {
+                  return Math.random() < 0.85;
+                },
+                content: function(game, event, current) {
+                  'step 0'
+                  const isDamagedNum = game.countPlayer(function(current) {
+                    return current.isDamaged();
+                  });
+                  const func = function(isDamagedNum, player, id) {
+                    const list = [
+                      '选项一：对一名角色造成2点伤害',
+                      '选项二：摸2~3张牌',
+                      '选项三：本回合出牌阶段可以多使用3张【杀】',
+                      '选项四：本回合手牌上限+4',
+                    ];
+                    const choiceList = ui.create.dialog(`氓情：请选择一${isDamagedNum ? "至" + (isDamagedNum > 3 ? "四" : get.cnNumber(isDamagedNum + 1)) : ""}项`);
+                    choiceList.videoId = id;
+                    for (let i = 0; i < list.length; i++) {
+                      let str = "<div class=\"popup text\" style=\"width:calc(100% - 10px);display:inline-block\">";
+                      str += list[i];
+                      str += "</div>";
+                      const next = choiceList.add(str);
+                      next.firstChild.addEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.button);
+                      next.firstChild.link = i;
+                      for (const j in lib.element.button) {
+                        next[j] = lib.element.button[j];
+                      }
+                      choiceList.buttons.add(next.firstChild);
+                    }
+                    return choiceList;
+                  }
+                  game.playThisAudio('voice/' + event.name + '1');
+                  if (player.isOnline2()) {
+                    player.send(func, player, event.videoId);
+                  }
+                  event.dialog = func(isDamagedNum, player, event.videoId);
+                  if (player !== game.me || _status.auto) {
+                    event.dialog.style.display = "none";
+                  }
+                  var next = player.chooseButton();
+                  next.set("dialog", event.videoId);
+                  next.set("forced", true);
+                  next.set("selectButton", [1, 1 + isDamagedNum]);
+                  'step 1'
+                  if (player.isOnline2()) {
+                    player.send("closeDialog", event.videoId);
+                  }
+                  event.dialog.close();
+                  result.links.sort();
+                  for (const i of result.links) {
+                    game.log(player, "选择了", "#g【氓情】", "的", "#y选项" + get.cnNumber(1 + i, true));
+                  }
+                  event.links = result.links;
+                  if (result.links.contains(1)) player.draw([2, 3].randomGet());
+                  if (result.links.contains(2)) player.addTempSkill('jl_zhouyi_mangqing2');
+                  if (result.links.contains(3)) player.addTempSkill('jl_zhouyi_mangqing3');
+                  'step 2'
+                  if (event.links.contains(0)) {
+                    player.chooseTarget("对一名角色造成2点伤害", true).set("ai", function(target) {
+                      const player = _status.event.player;
+                      return get.damageEffect(target, player, player);
+                    });
+                  } else {
+                    event.finish();
+                  }
+                  'step 3'
+                  if (result.bool) {
+                    const target = result.targets[0];
+                    player.line(target, 'gold');
+                    target.damage(2);
+                  }
+                },
+              },
+              mangqing2: {
+                mod: {
+                  cardUsable: function(card, player, num) {
+                    if (card.name === "sha") return num + 3;
+                  },
+                },
+              },
+              mangqing3: {
+                mod: {
+                  maxHandcard: function(player, num) {
+                    return num + 4;
+                  },
+                },
+              },
             },
           },
           jl_caochun: {
@@ -6069,6 +6232,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
           "jl_dj": "将灵等阶",
           "jl_dj_info": "",
 
+          "jl_zhouiyi": "周夷",
           "jl_caochun": "曹纯",
           "jl_zhangqiying": "张琪瑛",
           "jl_guansuo": "关索",
@@ -6110,6 +6274,7 @@ game.import("extension", function(lib, game, ui, get, ai, _status) {
           'jl_sunluban': '孙鲁班',
           'jl_guohuai': '郭淮',
 
+          "jl_zhouyi_info": '将灵周夷，拥有技能【<span style="color:#9933ff"><abbr title="逐寇：▶每回合限一次，当你于一名角色的出牌阶段造成伤害后，你有90%的概率摸X张牌并回复1点体力（X为本回合你已使用的牌数）"><ins>逐寇</ins></abbr></span>】、【<span style="color:#9933ff"><abbr title="氓情：▶准备阶段，你有85%的概率选择一项（每有一个受伤角色可多选一项）：1.对一名角色造成2点伤害；2.摸2~3张牌；3.本回合出牌阶段可以多使用3张【杀】；4.本回合手牌上限+4。"><ins>氓情</ins></abbr></span>】',
           "jl_caochun_info": '将灵曹纯，拥有技能【<span style="color:#9933ff"><abbr title="缮甲：▶每名角色的出牌阶段开始时，你有85%的概率可以摸2~4张牌，然后若此时是你的回合内，你可以视为使用一张【杀】，此【杀】不能被响应且伤害+1~2。（每轮限3次）"><ins>缮甲</ins></abbr></span>】、【<span style="color:#9933ff"><abbr title="骁锐：▶当你对其他角色造成伤害时，你有90%的概率随机获得其1~4张牌且此伤害+1~4（每回合限触发4次）"><ins>骁锐</ins></abbr></span>】',
           "jl_zhangqiying_info": '将灵张琪瑛，拥有技能【<span style="color:#9933ff"><abbr title="法箓：▶结束阶段，你有89.2%的概率随机获得牌堆中四种花色的牌各一张。若你因此获得了点数相同的牌，你回复1点体力并对至多两名其他角色各造成1点伤害。"><ins>法箓</ins></abbr></span>】、【<span style="color:#9933ff"><abbr title="点化：▶准备阶段，你有89.2%的概率可以观看牌堆顶的四张牌，然后以任意顺序放回牌堆顶。"><ins>点化</ins></abbr></span>】、【<span style="color:#9933ff"><abbr title="真仪：▶当你对其他角色造成伤害时，你有84.2%的概率令此伤害+1，然后随机获得其一张牌；当你受到其他角色造成的伤害时，你有84.2%的概率防止此伤害，然后你随机弃置伤害来源两张牌。（每个效果每回合各限触发2次）"><ins>真仪</ins></abbr></span>】',
           "jl_zhangfei_info": '将灵张飞，拥有技能【<span style="color:#9933ff"><abbr title="咆哮：▶你的出牌阶段开始时，有85%的概率多出1~5张【杀】，且无距离限制。"><ins>咆哮</ins></abbr></span>】、【<span style="color:#9933ff"><abbr title="替身：▶你受到伤害时，你有70%的概率回复1点体力并摸三张牌（每轮限3次）。"><ins>替身</ins></abbr></span>】',
