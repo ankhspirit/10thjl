@@ -2365,6 +2365,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){
             subSkill:{
               falu:{
                 name:'法箓',
+                audio:false,
                 forced:false,
                 locked:true,
                 prompt2:'结束阶段，你有89.2%的概率随机获得牌堆中四种花色的牌各一张。若你因此获得了点数相同的牌，你回复1点体力并对至多两名其他角色各造成1点伤害。',
@@ -2423,6 +2424,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){
               },
               dianhua:{
                 name:'点化',
+                audio:false,
                 forced:false,
                 locked:true,
                 prompt2:'准备阶段，你有89.2%的概率可以观看牌堆顶的四张牌，然后以任意顺序放回牌堆顶。',
@@ -2617,6 +2619,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){
               },
               zhenyi1:{
                 name:'真仪',
+                audio:false,
                 forced:false,
                 locked:true,
                 prompt2:'令此伤害+1，然后随机获得其一张牌',
@@ -2632,12 +2635,13 @@ game.import("extension",function(lib,game,ui,get,ai,_status){
                   else player.addTempSkill('jl_zhangqiying_count1','phaseZhunbeiBegin');
                   trigger.num=trigger.num+1;
                   player.line(trigger.player,'gold');
-                  var card=trigger.player.getCards('he').randomGets(1);
-                  player.gainPlayerCard(card,trigger.player,true);
+                  var card=trigger.player.getCards('he').randomGet();
+                  player.gain(card,trigger.player,'giveAuto','bySelf');
                 },
               },
               zhenyi2:{
                 name:'真仪',
+                audio:false,
                 forced:false,
                 locked:true,
                 prompt2:'防止此伤害，然后随机弃置其两张牌',
