@@ -506,7 +506,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 	};
 
 	let jl_valueres = {
-		xiaoshan: { gain: true, sp: 0, quality: "s" },
+		xiaoshan: { gain: false, sp: 0, quality: "s" },
 		zhouyi: { gain: false, sp: 0, quality: "s" },
 		caochun: { gain: false, sp: 0, quality: "s" },
 		zhangqiying: { gain: false, sp: 0, quality: "s" },
@@ -553,6 +553,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 		game.saveConfig("jl_zsd", 5);
 		game.saveConfig("jl_gjzsd", 5);
 		game.saveConfig("jl_hljh", 5);
+		game.saveConfig("jl_lingzhu", 0);
 		game.saveConfig("jl_value", jl_valueres);
 		game.saveConfig("jl_gmczjl", 0);
 		game.saveConfig("jl_cheat", 0);
@@ -567,27 +568,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 	}
 	if (config_jl_value_updated === true) {
 		game.saveConfig("jl_value", config_jl_value);
-	}
-	lib.config.jl_value["xiaoshan"] = { gain: true, sp: 0, quality: "s" };
-
-	if (lib.config.jl_bugnum !== 0) {
-		game.saveConfig("jl_zsd", 15);
-		game.saveConfig("jl_gjzsd", 10);
-		game.saveConfig("jl_hljh", 15);
-		game.saveConfig("jl_value", jl_valueres);
-		game.saveConfig("jl_gmczjl", 0);
-		game.saveConfig("jl_bugnum", 0);
-		game.saveConfig("jl_gmlv", "0");
-		lib.config.jl_value[s_character[4]]["gain"] = true;
-		game.saveConfig("jl_value", lib.config.jl_value);
-	}
-	if (!lib.config.jl_value["zhangfei"]) {
-		lib.config.jl_value["guansuo"] = { gain: false, sp: 0, quality: "s" };
-		lib.config.jl_value["shenguanyu"] = { gain: false, sp: 0, quality: "s" };
-		lib.config.jl_value["zhangxingcai"] = { gain: false, sp: 0, quality: "a" };
-		lib.config.jl_value["zhangfei"] = { gain: false, sp: 0, quality: "a" };
-		game.saveConfig("jl_value", lib.config.jl_value);
-		game.saveConfig("jl_lingzhu", 0);
 	}
 
 	jl_config.damageAnimation = function (name, trigger, event) {
@@ -766,7 +746,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 	};
 
 	jl_config.gameOver = function () {
-		let a1 = [0, 1].randomGet();
+		let a1 = parseInt(51 * Math.random());
 		let a2 = [0, 1, 2].randomGet();
 		let a3 = [0, 1].randomGet();
 		let lingzhu = Math.random();
@@ -854,7 +834,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
 		Object.assign(jl_jl1_text.style, {
 			bottom: "5px",
-			right: "-5px",
+			right: "0px",
 			width: "16px",
 			height: "16px",
 			position: "absolute",
@@ -2664,53 +2644,26 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 								const isDamagedNum = game.countPlayer(function (current) {
 									return current.isDamaged();
 								});
-								const func = function (isDamagedNum, player, id) {
-									const list = [
-										"选项一：对一名角色造成2点伤害",
-										"选项二：摸2~3张牌",
-										"选项三：本回合出牌阶段可以多使用3张【杀】",
-										"选项四：本回合手牌上限+4",
-									];
-									const choiceList = ui.create.dialog(
-										`氓情：请选择一${isDamagedNum ? "至" + (isDamagedNum > 3 ? "四" : get.cnNumber(isDamagedNum + 1)) : ""}项`
-									);
-									choiceList.videoId = id;
-									for (let i = 0; i < list.length; i++) {
-										let str =
-											'<div class="popup text" style="width:calc(100% - 10px);display:inline-block">';
-										str += list[i];
-										str += "</div>";
-										const next = choiceList.add(str);
-										next.firstChild.addEventListener(
-											lib.config.touchscreen ? "touchend" : "click",
-											ui.click.button
-										);
-										next.firstChild.link = i;
-										for (const j in lib.element.button) {
-											next[j] = lib.element.button[j];
-										}
-										choiceList.buttons.add(next.firstChild);
-									}
-									return choiceList;
-								};
-								game.playThisAudio("voice/" + event.name + "1");
-								if (player.isOnline2()) {
-									player.send(func, player, event.videoId);
+								const list = [
+									"选项一：对一名角色造成2点伤害",
+									"选项二：摸2~3张牌",
+									"选项三：本回合出牌阶段可以多使用3张【杀】",
+									"选项四：本回合手牌上限+4",
+								];
+								for (var i = 0; i < list.length; i++) {
+									list[i] = [i, list[i]];
 								}
-								event.dialog = func(isDamagedNum, player, event.videoId);
-								if (player !== game.me || _status.auto) {
-									event.dialog.style.display = "none";
-								}
-								var next = player.chooseButton();
-								next.set("dialog", event.videoId);
+								let next = player.chooseButton([
+									`氓情：请选择一${isDamagedNum ? "至" + (isDamagedNum > 3 ? "四" : get.cnNumber(isDamagedNum + 1)) : ""}项`,
+									[list, "tdnodes"],
+								]);
 								next.set("forced", true);
-								next.set("selectButton", [1, 1 + isDamagedNum]);
+								next.set(
+									"selectButton",
+									Array.from({ length: isDamagedNum + 1 }, (_, i) => i + 1)
+								);
+								game.playThisAudio("voice/" + event.name + "1");
 								("step 1");
-								if (player.isOnline2()) {
-									player.send("closeDialog", event.videoId);
-								}
-								event.dialog.close();
-								result.links.sort();
 								for (const i of result.links) {
 									game.log(
 										player,
@@ -6789,7 +6742,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 		author: "",
 		diskURL: "",
 		forumURL: "",
-		version: "1.0.11",
+		version: "1.0.12-beta.2",
 	};
 	for (const jlnameKey in jl_config.jlname) {
 		const jlName = jl_config.jlname[jlnameKey].name;
@@ -7159,7 +7112,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 		editable: false,
 		precontent: function (config) {
 			game.showExtensionChangeLog(
-				`【补丁11】①添加将灵小闪 ②修复将灵页面堆叠的bug ③更改千机之灵的描述，并默认关闭 ④同步将灵技能：张飞替身`,
+				`【${out_package.version}】①修复技能content报错②修复将灵页面资源文字颜色暗淡的bug③去除无效的动图，压缩动图（计划取消动图）④取消开局将灵小闪试用，增加唤灵宝箱产出⑤修复周夷【氓情】`,
 				"将灵重置版"
 			);
 			game.playThisAudio = function (filePathInAudioDir, audioType, playAudioCallback) {
@@ -7279,7 +7232,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			jl_version: {
-				name: "<b><span style='cursor: default'>补丁版本：补丁11</span></b>",
+				name: `<b><span style='cursor: default'>版本：${out_package.version}</span></b>`,
 				clear: true,
 			},
 
