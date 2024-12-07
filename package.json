@@ -1,0 +1,31 @@
+{
+    "name": "10thjl",
+    "version": "1.0.12-beta.1",
+    "description": "将灵重置版：无名杀将灵系统",
+    "main": "index.js",
+    "scripts": {
+        "lint": "eslint \"extension/*.js\" --fix"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@eslint/js": "^8.57.1",
+        "eslint": "8.57.0",
+        "globals": "^15.13.0",
+        "prettier": "^3.4.2"
+    },
+    "pnpm": {
+        "updateConfig": {
+            "ignoreDependencies": [
+                "@eslint/js",
+                "eslint"
+            ]
+        },
+        "peerDependencyRules": {
+            "allowAny": [
+                "eslint"
+            ]
+        }
+    }
+}
