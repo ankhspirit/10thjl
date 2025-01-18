@@ -2660,7 +2660,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 								next.set("forced", true);
 								next.set(
 									"selectButton",
-									Array.from({ length: isDamagedNum + 1 }, (_, i) => i + 1)
+									isDamagedNum === 0 ? [1] : [1, isDamagedNum + 1]
 								);
 								game.playThisAudio("voice/" + event.name + "1");
 								("step 1");
@@ -6742,7 +6742,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 		author: "",
 		diskURL: "",
 		forumURL: "",
-		version: "1.0.12-beta.2",
+		version: "1.0.12-beta.3",
 	};
 	for (const jlnameKey in jl_config.jlname) {
 		const jlName = jl_config.jlname[jlnameKey].name;
